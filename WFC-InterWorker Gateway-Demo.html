@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1>Zebra WorkForce Connect InterWorker Gateway Demo</h1>
+
+<script type="text/javascript">
+
+	var url = "";
+	
+	
+	// you can modify the content underneath to match you own demo
+	var message = "Display this<br />message<br />within WFC PTT Pro<br />"
+	var eid = "<your eid>";
+	
+	var method = "GET";
+	var messageId = "message";
+	var eidId = "eid";
+    var async = true;
+	var xhttp = new XMLHttpRequest();
+
+	function OnStateChange () {
+		if (xhttp.readyState == 0 || xhttp.readyState == 4) {
+			if (xhttp.readyState == 4 && xhttp.status == 200) {
+				 //alert(xhttp.responseText);
+				 document.getElementById("response").innerHTML = xhttp.responseText;
+			 }
+			if (xhttp.readyState == 4 && (xhttp.status == 400 || xhttp.status == 500)) {
+				 //alert(xhttp.responseText);
+				 document.getElementById("response").innerHTML = xhttp.responseText;
+			 }
+		}
+	}
+
+	function clearResponse() {
+		document.getElementById("response").innerHTML = "";
+	}
+
+	function OnLoad() {
+	
+	    var status = xhttp.status; // HTTP response status, e.g., 200 for "200 OK"
+        var data = xhttp.responseText; // Returned data, e.g., an HTML document.
+        if (status == 200) {
+			document.getElementById("response").innerHTML = data;
+			setTimeout(clearResponse,3000);
+        }
+        else {
+			document.getElementById("response").innerHTML = "ERROR: " + status + "</br></br>" + data;
+		}
+    }	
+
+	function OnError() {
+		document.getElementById("response").innerHTML = xhttp.responseText;
+		setTimeout(clearResponse,3000);
+	}
+
+
+	function UserAction(toDo) {
+
+		var formData = new FormData();
+
+		document.getElementById("response").innerHTML = "If no response is seen, you need to enable the CORP extention";
+		
+		try {
+	
+			xhttp.onload = 	 OnLoad;
+			xhttp.onError = OnError;
+			
+			if (toDo == "AskForHelp") {
+				// url need to be set according 
+				url = "https://<wfc iwg domain>:8443/gw/announce/msg?api_password=<your api password>";
+				method = "POST";
+				
+				formData.append(messageId,message);
+				formData.append(eidId,eid);
+				
+				xhttp.open(method, url, async);
+				xhttp.send(formData);
+			}
+					
+			if (toDo == "ListAnnounce") {
+				url = "https://<wfc iwg domain>:8443/gw/announce/list?api_password=<your api password>";
+				method = "GET";
+
+				xhttp.open(method, url, async);
+				xhttp.send();
+			}
+		} catch (error) {
+			document.getElementById("response").innerHTML = error;
+			setTimeout(clearResponse,3000);
+		}
+	}
+	
+	
+</script>
+
+    This demo is build for Chrome Browser.</br>
+	To use the demo, the extention CORS need to be installed.</br>
+	CORS Extention can be downloaded from https://mybrowseraddon.com/access-control-allow-origin.html</br></br>
+	To get help, press the "We Need Your Help" image</br>
+	</br></br>
+	<input type="image" src="WeNeedYourHelp.png" onclick=UserAction("AskForHelp")>
+	</br></br>
+	<div id="response"> 
+	</div>
+	</br></br>
+	2021 - Zebra Technologies - Raymond Buil
+</body>
+</html>
+
+
